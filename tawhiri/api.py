@@ -242,6 +242,12 @@ def run_prediction(req):
                               req['launch_longitude'], req['launch_altitude'],
                               stages)
     except Exception as e:
+        """
+        instead of raising exception
+        run code here to run new docker container with modified version of download.py
+        that keeps executing in the same place. code can just continue as is.
+        include a wait and a timout mechanism
+        """
         raise PredictionException("Prediction did not complete: '%s'." %
                                   str(e))
 

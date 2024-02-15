@@ -51,14 +51,30 @@ def _rfc3339_to_timestamp(dt):
     """
     return strict_rfc3339.rfc3339_to_timestamp(dt)
 
-
 def _timestamp_to_rfc3339(dt):
     """
     Convert from a UNIX timestamp to a RFC3339 timestamp.
     """
     return strict_rfc3339.timestamp_to_rfc3339_utcoffset(dt)
 
+def is_time_between(begin_time, end_time, dt_time):
+    """
+    used to convert conversion to nearest dataset time
+    """
+    return begin_time <= dt_time < end_time
+       
 
+def hour_to_nearest_dataset(day, hour):
+    """
+    returns nearest dataset time less than the requested hour
+    """
+    hours = [0,6,12,18]
+    end_hours = [6,12,18,24]
+    for i in range(4):
+        if is_time_between(hours[i],end_hours[i], hour):
+           if hours[i] == 0:
+               day = day-1
+           return day, hours[i]
 # Exceptions ##################################################################
 class APIException(Exception):
     """
@@ -187,12 +203,59 @@ def _extract_parameter(data, parameter, cast, default=None, ignore=False,
 
     return result
 
+def _is_old_dataset(req):
+    """
+    if dataset name is found in the default directory ("tawhiri_datasets" folder)
+    we still need to change req['dataset'] because we might still be working with an old file that is already downloaded by a previous run. so it's not ok to just use latest
+    
+    if it's not found then we're working with historical data. parse_request() by default will set req['dataset'] to LATEST_DATASET_KEYWORD if no dataset is passed
+    so we change this parameter manually to make that not the case.
+    """
+
+    dataset_name =_date_to_dataset_name(req['launch_datetime'])
+
+    
+    #list dir yields a namedtuple with the suffix field which is the first 10 characters of a file name. aka the file name
+    #
+    for stuff in WindDataset.listdir():
+        if dataset_name == stuff.filename:
+            req['dataset'] = dataset_name#we might still not want to use latest.
+            return False
+        
+    req['dataset'] = dataset_name
+    return True
+    
+def _date_to_dataset_name(rcf_launch_time):
+    """
+    converts req["launch_datetime"] to string of YYYYMMDDHH since that's how the dataset files are named in "tawhiri_datasets"
+    need to convert to nearest hours that data is collected
+    """
+    
+    #need to be careful here to convert the hour to the closest dataset, 00, 06, 12, 18
+    launch_time_stamp = _rfc3339_to_timestamp(rcf_launch_time)
+    launch_date_time = datetime.fromtimestamp(launch_time_stamp)
+    #changing hour to nearest dataset
+    dataset_day, dataset_hour = hour_to_nearest_dataset(launch_date_time.day, launch_date_time.hour)
+    launch_date_time = launch_date_time.replace(day = dataset_day, hour =dataset_hour)#replace does not work in place
+    filename = launch_date_time.strftime("%Y%m%d%H")
+
+    return filename
+
+def _download_old_dataset(launch_datetime):
+    #docker run tawhiri_download_container
+    #or call a shell script that runs download container since that's how things have been working so far
+    return
+
 
 # Response ####################################################################
 def run_prediction(req):
     """
     Run the prediction.
     """
+    #run this first since it modifies response dict:
+    if _is_old_dataset(req):
+        _download_old_dataset(req['launch_datime'])
+
     # Response dict
     resp = {
         "request": req,
@@ -203,7 +266,10 @@ def run_prediction(req):
 
     # Find wind data location
     ds_dir = app.config.get('WIND_DATASET_DIR', WindDataset.DEFAULT_DIRECTORY)
-
+    """
+    date_to_dataset_name(req['launch_datetime'])
+    
+    """
     # Dataset
     try:
         if req['dataset'] == LATEST_DATASET_KEYWORD:

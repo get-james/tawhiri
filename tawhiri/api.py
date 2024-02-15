@@ -23,7 +23,7 @@ from flask import Flask, jsonify, request, g
 from datetime import datetime
 import time
 import strict_rfc3339
-
+import subprocess
 from tawhiri import solver, models
 from tawhiri.dataset import Dataset as WindDataset
 from tawhiri.warnings import WarningCounts
@@ -208,12 +208,11 @@ def _is_old_dataset(req):
     if dataset name is found in the default directory ("tawhiri_datasets" folder)
     we still need to change req['dataset'] because we might still be working with an old file that is already downloaded by a previous run. so it's not ok to just use latest
     
-    if it's not found then we're working with historical data. parse_request() by default will set req['dataset'] to LATEST_DATASET_KEYWORD if no dataset is passed
-    so we change this parameter manually to make that not the case.
+    
     """
 
-    dataset_name =_date_to_dataset_name(req['launch_datetime'])
-
+    dataset_name, launch_dataset_time=_date_to_dataset_name(req['launch_datetime'])
+    req['dataset_time'] = launch_dataset_time
     
     #list dir yields a namedtuple with the suffix field which is the first 10 characters of a file name. aka the file name
     #
@@ -229,6 +228,7 @@ def _date_to_dataset_name(rcf_launch_time):
     """
     converts req["launch_datetime"] to string of YYYYMMDDHH since that's how the dataset files are named in "tawhiri_datasets"
     need to convert to nearest hours that data is collected
+    returns filename as will be found in directory and launch_date_time which will be attributed to launch dataset time which is the time of the dataset which will be downloaded
     """
     
     #need to be careful here to convert the hour to the closest dataset, 00, 06, 12, 18
@@ -239,11 +239,15 @@ def _date_to_dataset_name(rcf_launch_time):
     launch_date_time = launch_date_time.replace(day = dataset_day, hour =dataset_hour)#replace does not work in place
     filename = launch_date_time.strftime("%Y%m%d%H")
 
-    return filename
+    return filename, launch_date_time
 
 def _download_old_dataset(launch_datetime):
+    #may need to modify the launch datetime being passed.
     #docker run tawhiri_download_container
     #or call a shell script that runs download container since that's how things have been working so far
+    script_path = '/tawhiri_test/scripts/download-old-dataset.sh'
+    args = launch_datetime
+    subprocess.run([script_path] + args)#might need permissions, also may want to include a timeout
     return
 
 
@@ -253,9 +257,11 @@ def run_prediction(req):
     Run the prediction.
     """
     #run this first since it modifies response dict:
+    
     if _is_old_dataset(req):
-        _download_old_dataset(req['launch_datime'])
+        _download_old_dataset(req['dataset_time'])
 
+    
     # Response dict
     resp = {
         "request": req,
@@ -266,10 +272,7 @@ def run_prediction(req):
 
     # Find wind data location
     ds_dir = app.config.get('WIND_DATASET_DIR', WindDataset.DEFAULT_DIRECTORY)
-    """
-    date_to_dataset_name(req['launch_datetime'])
     
-    """
     # Dataset
     try:
         if req['dataset'] == LATEST_DATASET_KEYWORD:

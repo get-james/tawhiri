@@ -232,8 +232,8 @@ def _date_to_dataset_name(rcf_launch_time):
     """
     
     #need to be careful here to convert the hour to the closest dataset, 00, 06, 12, 18
-    launch_time_stamp = _rfc3339_to_timestamp(rcf_launch_time)
-    launch_date_time = datetime.fromtimestamp(launch_time_stamp)
+    
+    launch_date_time = datetime.fromtimestamp(rcf_launch_time)
     #changing hour to nearest dataset
     dataset_day, dataset_hour = hour_to_nearest_dataset(launch_date_time.day, launch_date_time.hour)
     launch_date_time = launch_date_time.replace(day = dataset_day, hour =dataset_hour)#replace does not work in place
@@ -261,7 +261,7 @@ def run_prediction(req):
     if _is_old_dataset(req):
         _download_old_dataset(req['dataset_time'])
 
-    
+
     # Response dict
     resp = {
         "request": req,

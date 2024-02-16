@@ -215,14 +215,15 @@ def _is_old_dataset(req):
     dataset_name, launch_dataset_time=_date_to_dataset_name(req['launch_datetime'])
     req['dataset_time'] = launch_dataset_time
     
+    
     #list dir yields a namedtuple with the suffix field which is the first 10 characters of a file name. aka the file name
     #
     for stuff in WindDataset.listdir():
         if dataset_name == stuff.filename:
-            req['dataset'] = int(dataset_name)#we might still not want to use latest.
+            req['dataset'] = launch_dataset_time#we might still not want to use latest.
             return False
         
-    req['dataset'] = int(dataset_name)
+    req['dataset'] = launch_dataset_time
     return True
     
 def _date_to_dataset_name(rcf_launch_time):
@@ -280,7 +281,7 @@ def run_prediction(req):
         if req['dataset'] == LATEST_DATASET_KEYWORD:
             tawhiri_ds = WindDataset.open_latest(persistent=True, directory=ds_dir)
         else:
-            tawhiri_ds = WindDataset(datetime.fromtimestamp(req['dataset']), directory=ds_dir)
+            tawhiri_ds = WindDataset(req['dataset'], directory=ds_dir)
     except IOError:
         raise InvalidDatasetException("No matching dataset found.")
     except ValueError as e:

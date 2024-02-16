@@ -237,7 +237,7 @@ def _date_to_dataset_name(rcf_launch_time):
     launch_date_time = datetime.fromtimestamp(rcf_launch_time)
     #changing hour to nearest dataset
     dataset_day, dataset_hour = hour_to_nearest_dataset(launch_date_time.day, launch_date_time.hour)
-    launch_date_time = launch_date_time.replace(day = dataset_day, hour =dataset_hour, minute = 0)#replace does not work in place
+    launch_date_time = launch_date_time.replace(day = dataset_day, hour = dataset_hour, minute = 0, second = 0, microsecond = 0)#replace does not work in place
     filename = launch_date_time.strftime("%Y%m%d%H")
 
     return filename, launch_date_time

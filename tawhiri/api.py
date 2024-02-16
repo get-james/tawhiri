@@ -360,7 +360,10 @@ def _parse_stages(labels, data):
         prediction.append(stage)
     return prediction
 
-
+@app.route('/api/docker/',methods = ['GET'])
+def run_docker():
+    date = request.args["date"]
+    _download_old_dataset(date)
 # Flask App ###################################################################
 @app.route('/api/v{0}/'.format(API_VERSION), methods=['GET'])
 def main():

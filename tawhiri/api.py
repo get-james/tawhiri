@@ -249,7 +249,7 @@ def _download_old_dataset(launch_datetime):
     script_path = '/tawhiri_test/scripts/download-old-dataset.sh'
     isodate = launch_datetime.isoformat()#downlaoder is expecting isoformat
     args = str(isodate)
-    subprocess.run([script_path] +' ' + args)#might need permissions, also may want to include a timeout
+    subprocess.run([script_path + ' ' + args])#might need permissions, also may want to include a timeout
     return
 
 

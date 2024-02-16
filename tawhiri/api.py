@@ -219,10 +219,10 @@ def _is_old_dataset(req):
     #
     for stuff in WindDataset.listdir():
         if dataset_name == stuff.filename:
-            req['dataset'] = dataset_name#we might still not want to use latest.
+            req['dataset'] = int(dataset_name)#we might still not want to use latest.
             return False
         
-    req['dataset'] = dataset_name
+    req['dataset'] = int(dataset_name)
     return True
     
 def _date_to_dataset_name(rcf_launch_time):

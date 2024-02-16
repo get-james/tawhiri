@@ -247,8 +247,9 @@ def _download_old_dataset(launch_datetime):
     #docker run tawhiri_download_container
     #or call a shell script that runs download container since that's how things have been working so far
     script_path = '/tawhiri_test/scripts/download-old-dataset.sh'
-    args = launch_datetime
-    subprocess.run([script_path] + args)#might need permissions, also may want to include a timeout
+    isodate = launch_datetime.isoformat()#downlaoder is expecting isoformat
+    args = str(isodate)
+    subprocess.run([script_path] +' ' + args)#might need permissions, also may want to include a timeout
     return
 
 

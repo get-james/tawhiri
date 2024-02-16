@@ -362,9 +362,12 @@ def _parse_stages(labels, data):
 
 @app.route('/api/v{0}/docker'.format(API_VERSION),methods = ['GET'])
 def run_docker():
-    date = request.args["date"]
+    date_iso = request.args["date"]
+    date_iso = date_iso.replace('Z','+00:00')
+    date = datetime.fromisoformat(date_iso)
     _download_old_dataset(date)
-    return "ok"
+    return "{}"
+    
 # Flask App ###################################################################
 @app.route('/api/v{0}/'.format(API_VERSION), methods=['GET'])
 def main():

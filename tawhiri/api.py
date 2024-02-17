@@ -247,12 +247,23 @@ def _download_old_dataset(launch_datetime):
     #may need to modify the launch datetime being passed.
     #docker run tawhiri_download_container
     #or call a shell script that runs download container since that's how things have been working so far
-    script_path = '/srv/scripts/trigger.sh'
+    #script_path = '/srv/scripts/trigger.sh'
     isodate = launch_datetime.isoformat()#downlaoder is expecting isoformat
-    args = str(isodate)
-    subprocess.run([script_path, args])#might need permissions, also may want to include a timeout
+    script_path = '/srv/observed/' + isodate
+    touch_file(file_path)
+    #args = str(isodate)
+    #subprocess.run([script_path, args])#might need permissions, also may want to include a timeout
     return
-
+    
+def touch_file(file_path):
+    try:
+        #openfile in write mode so file is created if it doesn't exist
+        with open(file_path, 'w'):
+            pass#leave file empty
+        print(f"Empty file created: {file_path}")
+    except Exception as e:
+        print(f"an error occured: {e}")
+              
 
 # Response ####################################################################
 def run_prediction(req):

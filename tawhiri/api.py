@@ -250,7 +250,7 @@ def _download_old_dataset(launch_datetime):
     #script_path = '/srv/scripts/trigger.sh'
     isodate = launch_datetime.isoformat()#downlaoder is expecting isoformat
     script_path = '/srv/observed/' + isodate
-    touch_file(file_path)
+    touch_file(script_path)
     #args = str(isodate)
     #subprocess.run([script_path, args])#might need permissions, also may want to include a timeout
     return

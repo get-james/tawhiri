@@ -247,7 +247,7 @@ def _download_old_dataset(launch_datetime):
     #may need to modify the launch datetime being passed.
     #docker run tawhiri_download_container
     #or call a shell script that runs download container since that's how things have been working so far
-    script_path = '/srv/scripts/download-old-dataset.sh'
+    script_path = '/srv/scripts/trigger.sh'
     isodate = launch_datetime.isoformat()#downlaoder is expecting isoformat
     args = str(isodate)
     subprocess.run([script_path, args])#might need permissions, also may want to include a timeout
@@ -360,14 +360,6 @@ def _parse_stages(labels, data):
         prediction.append(stage)
     return prediction
 
-@app.route('/api/v{0}/docker'.format(API_VERSION),methods = ['GET'])
-def run_docker():
-    date_iso = request.args["date"]
-    date_iso = date_iso.replace('Z','+00:00')
-    date = datetime.fromisoformat(date_iso)
-    _download_old_dataset(date)
-    return "{}"
-    
 # Flask App ###################################################################
 @app.route('/api/v{0}/'.format(API_VERSION), methods=['GET'])
 def main():

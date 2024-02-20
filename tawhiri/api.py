@@ -68,13 +68,12 @@ def is_time_between(begin_time, end_time, dt_time):
 def hour_to_nearest_dataset(day, hour):
     """
     returns nearest dataset time less than the requested hour
+    we do this since the datasets are published and named every 6 hours (00,06,12,18)
     """
     hours = [0,6,12,18]
     end_hours = [6,12,18,24]
     for i in range(4):
         if is_time_between(hours[i],end_hours[i], hour):
-           if hours[i] == 0:
-               day = day-1
            return day, hours[i]
 # Exceptions ##################################################################
 class APIException(Exception):

@@ -270,7 +270,8 @@ def run_prediction(req):
     Run the prediction.
     """
     #run this first since it modifies response dict:
-    
+    #req['dataset_time'] is a parameter I added to the req dict. It's the prediction time requested converted to the nearest dataset time.
+    #without this conversion, _download_old_dataset wont work as it'll be looking for a dataset named after whichever time is passed in.
     if _is_old_dataset(req):
         _download_old_dataset(req['dataset_time'])
 
@@ -287,6 +288,9 @@ def run_prediction(req):
     ds_dir = app.config.get('WIND_DATASET_DIR', WindDataset.DEFAULT_DIRECTORY)
     
     # Dataset
+    # with the added feature of being able to download and access old datasets, req['dataset'] will never equal LATEST_DATASET_KEYWORD
+    # with the original implementation it was the opposite case. it was always the first if that was triggered since datasets were never passed in as far as I know
+    # and parse_request() would set req['dataset'] to LATEST_DATASET_KEYWORD
     try:
         if req['dataset'] == LATEST_DATASET_KEYWORD:
             tawhiri_ds = WindDataset.open_latest(persistent=True, directory=ds_dir)

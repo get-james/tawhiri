@@ -177,6 +177,9 @@ def parse_request(data):
                                         LATEST_DATASET_KEYWORD)
 
     return req
+def _get_request_type(data):
+    req_type = _extract_parameter(data, "type")
+    return req_type
 
 
 def _extract_parameter(data, parameter, cast, default=None, ignore=False,

@@ -119,7 +119,7 @@ class NotYetImplementedException(APIException):
 
 
 # Request #####################################################################
-def parse_request(data):
+def parse_prediction_request(data):
     """
     Parse the request.
     """
@@ -176,7 +176,17 @@ def parse_request(data):
     req['dataset'] = _extract_parameter(data, "dataset", _rfc3339_to_timestamp,
                                         LATEST_DATASET_KEYWORD)
 
-    return req
+def parse_request(data):
+    request_type = _get_request_type(data)
+    match request_type:
+        case "prediction": return run_prediction(parse_prediction_request(data))
+
+        case "load_datasets": return _get_present_datasets(data)
+
+   
+    return
+            
+    
 def _get_request_type(data):
     req_type = _extract_parameter(data, "type")
     return req_type
@@ -205,6 +215,23 @@ def _extract_parameter(data, parameter, cast, default=None, ignore=False,
                                (parameter, data[parameter]))
 
     return result
+
+
+def _get_present_datasets(req):
+    """
+    uses listdir() function from WindDataset to build and return a list of present datasets
+    """
+    datasets = []
+    #To Do:
+    #could implement some verification here
+    for stuff in WindDataset.listdir():
+        datasets.append(stuff)
+    resp = {
+        "request": req,
+        "datasets": datasets,
+    }
+    
+    return datasets
 
 def _is_old_dataset(req):
     """
@@ -380,7 +407,12 @@ def main():
     Single API endpoint which accepts GET requests.
     """
     g.request_start_time = time.time()
-    response = run_prediction(parse_request(request.args))
+
+    response = parse_request(request.args)
+    
+    #run prediction returns resp in a specific way. need to mimic it with load_datasets
+
+    #response = run_prediction(parse_prediction_request(request.args))
     g.request_complete_time = time.time()
     response['metadata'] = _format_request_metadata()
     return jsonify(response)

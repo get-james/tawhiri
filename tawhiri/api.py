@@ -188,7 +188,7 @@ def parse_request(data):
             
     
 def _get_request_type(data):
-    req_type = _extract_parameter(data, "type")
+    req_type = _extract_parameter(data, "type", str)
     return req_type
 
 

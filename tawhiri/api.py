@@ -179,11 +179,14 @@ def parse_prediction_request(data):
 def parse_request(data):
     request_type = _get_request_type(data)
     match request_type:
-        case "prediction": return run_prediction(parse_prediction_request(data))
+        case "prediction":
+            return run_prediction(parse_prediction_request(data))
 
-        case "load_datasets": return _get_present_datasets(data)
+        case "load_datasets":
+            return _get_present_datasets(data)
 
-   
+        case _:
+            return "invalid request type"
     return
             
     

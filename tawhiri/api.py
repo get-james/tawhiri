@@ -418,7 +418,7 @@ def main():
 
     #response = run_prediction(parse_prediction_request(request.args))
     g.request_complete_time = time.time()
-    response['metadata'] = _format_request_metadata()
+    #response['metadata'] = _format_request_metadata()
     return jsonify(response)
 
 

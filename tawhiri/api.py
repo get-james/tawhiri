@@ -175,6 +175,7 @@ def parse_prediction_request(data):
     # Dataset
     req['dataset'] = _extract_parameter(data, "dataset", _rfc3339_to_timestamp,
                                         LATEST_DATASET_KEYWORD)
+    return req
 
 def parse_request(data):
     request_type = _get_request_type(data)

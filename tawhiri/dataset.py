@@ -149,13 +149,18 @@ class Dataset(object):
         :param only_suffices: if not ``None``, only return results with a
                               suffix contained in this set
         :rtype: (named) tuples ``(dataset time, suffix, filename, full path)``
+
+        modified:
+        added second 2 iffs so that datasets that are currently being downloaded(prefixed with download-) would be returned
         """
 
         for filename in os.listdir(directory):
             if len(filename) < 10:
                 continue
-
-            ds_time_str = filename[:10]
+            if len(filename) == 10:
+                ds_time_str = filename[:10]
+            if len(filename) > 10:
+                ds_time_str = filename[-10:] 
             try:
                 ds_time = datetime.strptime(ds_time_str, "%Y%m%d%H")
             except ValueError:
@@ -167,6 +172,7 @@ class Dataset(object):
 
                 yield cls._listdir_type(ds_time, suffix, filename,
                                         os.path.join(directory, filename))
+
 
     cached_latest = None
 

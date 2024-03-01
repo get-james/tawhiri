@@ -231,7 +231,7 @@ def _get_present_datasets(req):
         "datasets": datasets,
     }
     
-    return datasets
+    return resp
 
 def _is_old_dataset(req):
     """

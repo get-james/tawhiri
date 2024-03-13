@@ -274,15 +274,17 @@ def _date_to_dataset_name(rcf_launch_time):
     return filename, launch_date_time
 
 def _download_old_dataset(launch_datetime):
-    #may need to modify the launch datetime being passed.
-    #docker run tawhiri_download_container
-    #or call a shell script that runs download container since that's how things have been working so far
-    #script_path = '/srv/scripts/trigger.sh'
+    """
+    triggers inotify watch that downloads a file corresponding to the filename of the file created.
+
+    also touches the file name to deletion_exclusion_list directory; the cronjob won't delete files whose names are present in that list directory.
+    """
     isodate = launch_datetime.isoformat()#downlaoder is expecting isoformat
     script_path = '/srv/observed/' + isodate
     touch_file(script_path)
-    #args = str(isodate)
-    #subprocess.run([script_path, args])#might need permissions, also may want to include a timeout
+
+    exclusion_scipt_path = '/srv/deletion_exclusion_list/' + isodate
+    touch_file(exclusion_script_path)
     return
     
 def touch_file(file_path):

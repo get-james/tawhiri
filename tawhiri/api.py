@@ -193,16 +193,22 @@ def _get_request_type(data):
     return req_type
 
 
-def _extract_parameter(data, parameter, cast, default=None, ignore=False,
+def _extract_parameter(data, parameter, cast, default="prediction", ignore=False,
                        validator=None):
     """
     Extract a parameter from the POST request and raise an exception if any
     parameter is missing or invalid.
+
+    In order to remain compatible with old version of QGIS plugin, the default is set to "prediction" as that's the old default. And it'll check to make sure _extract_parameter("launch_latitude") returns something to make sure it's the antiquated
+    request form taking place.
     """
     if parameter not in data:
         if default is None and not ignore:
             raise RequestException("Parameter '%s' not provided in request." %
                                    parameter)
+        if not _extract_parameter(data, "launch_latitude", float):
+            raise RequestException("Invalid Request")
+            
         return default
 
     try:

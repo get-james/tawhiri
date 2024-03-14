@@ -251,8 +251,8 @@ def _is_old_dataset(req):
     #check here if it's a prediction for the future
 
     current_time = datetime.now()
-    max_time = current_time + timedelta(delta(hours=180)
-    if current_time <= launch_dataset_time< max_time:
+    max_time = current_time + timedelta(hours=180)
+    if current_time <= launch_dataset_time < max_time:
         return False
     
     #list dir yields a namedtuple with the suffix field which is the first 10 characters of a file name. aka the file name

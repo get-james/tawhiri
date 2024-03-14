@@ -279,10 +279,15 @@ def _date_to_dataset_name(rcf_launch_time):
 def _download_old_dataset(launch_datetime):
     """
     triggers inotify watch that downloads a file corresponding to the filename of the file created.
+
+    exclusion list is checked so that historical datasets aren't deleted
     """
-    isodate = launch_datetime.isoformat()#downlaoder is expecting isoformat
+    isodate = launch_datetime.isoformat()#downloader is expecting isoformat
     script_path = '/srv/observed/' + isodate
     touch_file(script_path)
+
+    exclusion_scipt_path = '/srv/deletion_exclusion_list/' + isodate
+    touch_file(exclusion_script_path)
 
     
     

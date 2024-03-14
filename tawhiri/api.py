@@ -21,7 +21,7 @@ Provide the HTTP API for Tawhiri.
 #test docker download zip update
 
 from flask import Flask, jsonify, request, g
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import strict_rfc3339
 import subprocess
@@ -247,7 +247,13 @@ def _is_old_dataset(req):
 
     dataset_name, launch_dataset_time=_date_to_dataset_name(req['launch_datetime'])
     req['dataset_time'] = launch_dataset_time
-    
+
+    #check here if it's a prediction for the future
+
+    current_time = datetime.now()
+    max_time = current_time + timedelta(delta(hours=180)
+    if current_time <= launch_dataset_time< max_time:
+        return False
     
     #list dir yields a namedtuple with the suffix field which is the first 10 characters of a file name. aka the file name
     #

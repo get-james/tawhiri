@@ -206,9 +206,6 @@ def _extract_parameter(data, parameter, cast, default="prediction", ignore=False
         if default is None and not ignore:
             raise RequestException("Parameter '%s' not provided in request." %
                                    parameter)
-        if not _extract_parameter(data, "launch_latitude", float):
-            raise RequestException("Invalid Request")
-            
         return default
 
     try:

@@ -292,7 +292,7 @@ def _download_old_dataset(launch_datetime):
     script_path = '/srv/observed/' + isodate
     touch_file(script_path)
 
-    exclusion_scipt_path = '/srv/deletion_exclusion_list/' + isodate
+    exclusion_script_path = '/srv/deletion_exclusion_list/' + isodate
     touch_file(exclusion_script_path)
 
     
